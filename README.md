@@ -2,6 +2,20 @@
 
 A Spring Boot REST API for a peer-to-peer skill exchange platform. Users can list skills they want to teach or learn, send exchange requests, chat with each other, and leave reviews.
 
+---
+
+## TODO
+
+### Topics to Learn / Research
+
+- [ ] **JWT Authentication** — Secure API endpoints with JSON Web Tokens (login, registration, token refresh)
+- [ ] **Recommendation Algorithm/Model** — Suggest skill matches based on user preferences, location, experience level, etc.
+- [ ] **Real-time Chat System** — Implement WebSocket-based messaging (Spring WebSocket / STOMP) instead of REST polling
+- [ ] **Email Notifications** — Notify users on new requests, messages, and reviews
+- [ ] **Add remaining services and controllers** — Complete any missing CRUD operations and endpoints
+
+---
+
 ## Tech Stack
 
 - **Java 17**
@@ -186,4 +200,3 @@ src/main/java/com/backend/SkillSwipe/
 - **Reviews:** A user cannot review themselves
 - **User Update:** Supports partial updates (null fields are ignored)
 - **Dashboard:** Shows only active requests (PENDING/ACCEPTED), completed sessions, and average rating
-
