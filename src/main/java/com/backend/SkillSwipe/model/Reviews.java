@@ -1,5 +1,6 @@
 package com.backend.SkillSwipe.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -14,10 +15,12 @@ public class Reviews {
 
     @ManyToOne
     @JoinColumn(name = "reviewer_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Users reviewer;
 
     @ManyToOne
     @JoinColumn(name = "reviewed_user_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Users reviewedUser;
 
     @Column(nullable = false)

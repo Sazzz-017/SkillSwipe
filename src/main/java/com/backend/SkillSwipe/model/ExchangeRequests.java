@@ -1,5 +1,6 @@
 package com.backend.SkillSwipe.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -14,18 +15,22 @@ public class ExchangeRequests {
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Users sender;
 
     @ManyToOne
     @JoinColumn(name = "receiver_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Users receiver;
 
     @ManyToOne
     @JoinColumn(name = "offered_skill_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Skills offeredSkill;
 
     @ManyToOne
     @JoinColumn(name = "requested_skill_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Skills requestedSkill;
 
     @Column
