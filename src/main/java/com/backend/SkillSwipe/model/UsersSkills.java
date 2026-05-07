@@ -10,6 +10,7 @@ import lombok.Data;
 public class UsersSkills {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne

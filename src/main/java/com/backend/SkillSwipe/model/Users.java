@@ -1,5 +1,6 @@
 package com.backend.SkillSwipe.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import lombok.Data;
 @Entity
 public class Users {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="userId")
     int userId;
 
@@ -21,6 +23,7 @@ public class Users {
     @Column(name="userEmail",unique = true)
     String userEmail;
 
+    @JsonIgnore
     @Column(name="userPassword")
     String userPassword;
 

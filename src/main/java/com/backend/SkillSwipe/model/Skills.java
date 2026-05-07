@@ -12,6 +12,7 @@ import lombok.Data;
 @Entity
 public class Skills {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="skillId")
     int skillId;
 
