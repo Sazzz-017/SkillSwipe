@@ -14,23 +14,23 @@ import lombok.Data;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="userId")
+    @Column(name="user_id")
     int userId;
 
-    @Column(name="userName")
+    @Column(name="user_name")
     String userName;
 
-    @Column(name="userEmail",unique = true)
+    @Column(name="user_email", unique = true)
     String userEmail;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(name="userPassword")
+    @Column(name="user_password")
     String userPassword;
 
-    @Column(name="userBio")
+    @Column(name="user_bio")
     String userBio;
 
-    @Column(name="userRole")
+    @Column(name="user_role")
     String userRole;
 
 }
