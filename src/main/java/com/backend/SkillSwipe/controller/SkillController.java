@@ -23,11 +23,11 @@ public class SkillController {
     }
     // POST /api/users/skills
     @PostMapping("/api/users/skills")
-    public ResponseEntity<UsersSkills> addSkillToUser(@RequestBody UsersSkills usersSkills) {
+    public ResponseEntity<?> addSkillToUser(@RequestBody UsersSkills usersSkills) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(skillService.addSkillToUser(usersSkills));
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
     // DELETE /api/users/skills/{id}

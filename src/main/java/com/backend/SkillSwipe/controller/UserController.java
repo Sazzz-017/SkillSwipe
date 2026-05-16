@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -14,6 +15,15 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    // GET /api/users/me — returns the currently logged-in user's profile
+    // Principal is populated by Spring Security from the JWT filter
+    @GetMapping("/me")
+    public ResponseEntity<Users> getCurrentUser(Principal principal) {
+        return userService.findByEmail(principal.getName())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     // GET /api/users/{id}
     @GetMapping("/{id}")

@@ -1,12 +1,17 @@
 package com.backend.SkillSwipe.service;
 
 import com.backend.SkillSwipe.dto.UserDTO;
+import com.backend.SkillSwipe.kafka.dto.LikeNotificationEvent;
+import com.backend.SkillSwipe.kafka.producer.KafkaProducerService;
 import com.backend.SkillSwipe.model.*;
 import com.backend.SkillSwipe.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -14,6 +19,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class SwipeService {
+
+    private static final Logger log = LoggerFactory.getLogger(SwipeService.class);
 
     @Autowired
     private UserRepo userRepo;
@@ -26,6 +33,15 @@ public class SwipeService {
 
     @Autowired
     private ExchangeRequestsRepo exchangeRequestsRepo;
+
+    /**
+     * KafkaProducerService is injected here to publish a LikeNotificationEvent
+     * asynchronously after a successful LIKE action.
+     * The email is NOT sent here — it is handled by the Kafka consumer,
+     * keeping this service fast and the HTTP response unblocked.
+     */
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
 
     public List<UserDTO> getCandidates(int userId) {
         Users user = userRepo.findById(userId)
@@ -92,8 +108,22 @@ public class SwipeService {
         swipeAction.setAction(action);
         swipeActionRepo.save(swipeAction);
 
-        // If LIKE, check for mutual match
+        // If LIKE, check for mutual match AND send async notification email
         if (action == SwipeAction.Action.LIKE) {
+            // ── Async email notification via Kafka ──────────────────────────
+            // We publish the event here, immediately after the like is saved.
+            // The Kafka consumer will pick it up and send the email without
+            // blocking this HTTP request thread.
+            LikeNotificationEvent event = new LikeNotificationEvent(
+                    target.getUserEmail(),
+                    target.getUserName(),
+                    swiper.getUserName(),
+                    LocalDateTime.now()
+            );
+            kafkaProducerService.publishLikeNotification(event);
+            log.info("[SwipeService] Like notification event published for target user '{}'", target.getUserEmail());
+            // ────────────────────────────────────────────────────────────────
+
             Optional<SwipeAction> reverse = swipeActionRepo.findBySwiperAndTarget(target, swiper);
             if (reverse.isPresent() && reverse.get().getAction() == SwipeAction.Action.LIKE) {
                 // reverse.get().swiper = the first liker (target of this action) → they become sender

@@ -1,0 +1,63 @@
+version: "3.8"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Docker Compose — Local Kafka + Zookeeper for SkillSwipe development
+#
+# How to start:
+#   docker compose up -d
+#
+# How to stop:
+#   docker compose down
+#
+# How to verify Kafka is running:
+#   docker compose ps
+#
+# How to create the topic manually (optional — Spring does it automatically):
+#   docker exec -it skillswipe-kafka \
+#     kafka-topics.sh --create \
+#       --topic user-like-notification \
+#       --bootstrap-server localhost:9092 \
+#       --partitions 1 \
+#       --replication-factor 1
+#
+# How to list topics:
+#   docker exec -it skillswipe-kafka \
+#     kafka-topics.sh --list --bootstrap-server localhost:9092
+#
+# How to consume messages (debug):
+#   docker exec -it skillswipe-kafka \
+#     kafka-console-consumer.sh \
+#       --topic user-like-notification \
+#       --bootstrap-server localhost:9092 \
+#       --from-beginning
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: skillswipe-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: skillswipe-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # PLAINTEXT_HOST listener is what your Spring app connects to on localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 24

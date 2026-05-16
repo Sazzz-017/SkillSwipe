@@ -14,6 +14,10 @@ public class UserService {
     @Autowired
     UserRepo userRepo;
 
+    public Optional<Users> findByEmail(String email) {
+        return userRepo.findByUserEmail(email);
+    }
+
     public Optional<Users> findById(int id) {
         return userRepo.findById(id);
     }
