@@ -34,12 +34,6 @@ public class SwipeService {
     @Autowired
     private ExchangeRequestsRepo exchangeRequestsRepo;
 
-    /**
-     * KafkaProducerService is injected here to publish a LikeNotificationEvent
-     * asynchronously after a successful LIKE action.
-     * The email is NOT sent here — it is handled by the Kafka consumer,
-     * keeping this service fast and the HTTP response unblocked.
-     */
     @Autowired
     private KafkaProducerService kafkaProducerService;
 
@@ -59,12 +53,10 @@ public class SwipeService {
                 .map(s -> s.getSkill().getSkillId())
                 .collect(Collectors.toSet());
 
-        // IDs of users already swiped on
         Set<Integer> alreadySwiped = swipeActionRepo.findBySwiper(user).stream()
                 .map(sa -> sa.getTarget().getUserId())
                 .collect(Collectors.toSet());
 
-        // Find all users whose skills overlap with mine
         List<Users> allOtherUsers = userRepo.findAll().stream()
                 .filter(u -> u.getUserId() != userId)
                 .filter(u -> !alreadySwiped.contains(u.getUserId()))
@@ -81,9 +73,7 @@ public class SwipeService {
                             .filter(s -> s.getType() == UsersSkills.UserSkillType.LEARN)
                             .map(s -> s.getSkill().getSkillId())
                             .collect(Collectors.toSet());
-                    // They teach something I want to learn
                     boolean theyTeachWhatILearn = theirTeachIds.stream().anyMatch(myLearnSkillIds::contains);
-                    // They want to learn something I teach
                     boolean theyLearnWhatITeach = theirLearnIds.stream().anyMatch(myTeachSkillIds::contains);
                     return theyTeachWhatILearn || theyLearnWhatITeach;
                 })
@@ -100,7 +90,6 @@ public class SwipeService {
 
         SwipeAction.Action action = SwipeAction.Action.valueOf(actionStr);
 
-        // Upsert: update if exists, else create
         SwipeAction swipeAction = swipeActionRepo.findBySwiperAndTarget(swiper, target)
                 .orElse(new SwipeAction());
         swipeAction.setSwiper(swiper);
@@ -108,12 +97,7 @@ public class SwipeService {
         swipeAction.setAction(action);
         swipeActionRepo.save(swipeAction);
 
-        // If LIKE, check for mutual match AND send async notification email
         if (action == SwipeAction.Action.LIKE) {
-            // ── Async email notification via Kafka ──────────────────────────
-            // We publish the event here, immediately after the like is saved.
-            // The Kafka consumer will pick it up and send the email without
-            // blocking this HTTP request thread.
             LikeNotificationEvent event = new LikeNotificationEvent(
                     target.getUserEmail(),
                     target.getUserName(),
@@ -122,11 +106,9 @@ public class SwipeService {
             );
             kafkaProducerService.publishLikeNotification(event);
             log.info("[SwipeService] Like notification event published for target user '{}'", target.getUserEmail());
-            // ────────────────────────────────────────────────────────────────
 
             Optional<SwipeAction> reverse = swipeActionRepo.findBySwiperAndTarget(target, swiper);
             if (reverse.isPresent() && reverse.get().getAction() == SwipeAction.Action.LIKE) {
-                // reverse.get().swiper = the first liker (target of this action) → they become sender
                 createMatchedExchangeRequest(target, swiper);
             }
         }
@@ -136,13 +118,11 @@ public class SwipeService {
 
     @Transactional
     public ExchangeRequests acceptLike(int swiperId, int targetId) {
-        // swiperId = original liker, targetId = logged-in user accepting
         Users swiper = userRepo.findById(swiperId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + swiperId));
         Users target = userRepo.findById(targetId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + targetId));
 
-        // Record that targetId now likes swiperId back
         SwipeAction swipeAction = swipeActionRepo.findBySwiperAndTarget(target, swiper)
                 .orElse(new SwipeAction());
         swipeAction.setSwiper(target);
@@ -168,7 +148,6 @@ public class SwipeService {
         request.setReceiver(receiver);
         request.setStatus(ExchangeRequests.Status.ACCEPTED);
 
-        // Use first available skills as placeholders — the match is the important part
         List<UsersSkills> senderSkills = userSkillsRepo.findByUser(sender);
         List<UsersSkills> receiverSkills = userSkillsRepo.findByUser(receiver);
 

@@ -16,13 +16,11 @@ public class ExchangeRequestController {
     @Autowired
     ExchangeRequestService exchangeRequestService;
 
-    // POST /api/requests
     @PostMapping
     public ResponseEntity<ExchangeRequests> createRequest(@RequestBody ExchangeRequests request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(exchangeRequestService.createRequest(request));
     }
 
-    // GET /api/requests/sent?userId=
     @GetMapping("/sent")
     public ResponseEntity<List<ExchangeRequests>> getSentRequests(@RequestParam int userId) {
         try {
@@ -32,7 +30,6 @@ public class ExchangeRequestController {
         }
     }
 
-    // GET /api/requests/received?userId=
     @GetMapping("/received")
     public ResponseEntity<List<ExchangeRequests>> getReceivedRequests(@RequestParam int userId) {
         try {
@@ -42,7 +39,6 @@ public class ExchangeRequestController {
         }
     }
 
-    // PUT /api/requests/{id}/accept
     @PutMapping("/{id}/accept")
     public ResponseEntity<?> acceptRequest(@PathVariable int id) {
         try {
@@ -52,7 +48,6 @@ public class ExchangeRequestController {
         }
     }
 
-    // PUT /api/requests/{id}/reject
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> rejectRequest(@PathVariable int id) {
         try {
@@ -62,7 +57,6 @@ public class ExchangeRequestController {
         }
     }
 
-    // PUT /api/requests/{id}/complete
     @PutMapping("/{id}/complete")
     public ResponseEntity<?> completeRequest(@PathVariable int id) {
         try {

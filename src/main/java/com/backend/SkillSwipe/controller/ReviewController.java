@@ -16,7 +16,6 @@ public class ReviewController {
     @Autowired
     ReviewService reviewService;
 
-    // POST /api/reviews
     @PostMapping
     public ResponseEntity<?> createReview(@RequestBody Reviews review) {
         try {
@@ -26,7 +25,6 @@ public class ReviewController {
         }
     }
 
-    // GET /api/reviews/user/{id}
     @GetMapping("/user/{id}")
     public ResponseEntity<List<Reviews>> getReviewsForUser(@PathVariable int id) {
         try {

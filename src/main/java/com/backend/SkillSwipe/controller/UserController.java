@@ -21,8 +21,6 @@ public class UserController {
     @Autowired
     BioService bioService;
 
-    // GET /api/users/me — returns the currently logged-in user's profile
-    // Principal is populated by Spring Security from the JWT filter
     @GetMapping("/me")
     public ResponseEntity<Users> getCurrentUser(Principal principal) {
         return userService.findByEmail(principal.getName())
@@ -30,7 +28,6 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // GET /api/users/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Users> getUserById(@PathVariable int id) {
         return userService.findById(id)
@@ -38,7 +35,6 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // PUT /api/users/update
     @PutMapping("/update")
     public ResponseEntity<Users> updateUser(@RequestBody Users user) {
         try {
@@ -48,13 +44,11 @@ public class UserController {
         }
     }
 
-    // GET /api/users/search?name=
     @GetMapping("/search")
     public ResponseEntity<List<Users>> searchUsers(@RequestParam String name) {
         return ResponseEntity.ok(userService.searchByName(name));
     }
 
-    // POST /api/users/{id}/generate-bio — generates an AI bio based on user's skills
     @PostMapping("/{id}/generate-bio")
     public ResponseEntity<Map<String, String>> generateBio(@PathVariable int id) {
         try {

@@ -9,21 +9,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-/**
- * EmailNotificationService — responsible for constructing and sending
- * transactional emails via JavaMailSender (Brevo SMTP).
- *
- * Why Brevo (formerly Sendinblue)?
- *  - Reliable SMTP relay with high deliverability.
- *  - Free tier covers thousands of emails/month.
- *  - Configured through standard spring.mail.* properties, so we stay
- *    framework-agnostic here — swapping to another SMTP provider only
- *    requires changing application.properties.
- *
- * This service is called ONLY by the Kafka consumer, never directly
- * by a controller or the SwipeService. That keeps the email logic
- * decoupled from the HTTP request lifecycle.
- */
 @Service
 public class EmailNotificationService {
 
@@ -38,25 +23,17 @@ public class EmailNotificationService {
         this.mailSender = mailSender;
     }
 
-    /**
-     * Sends a "someone liked your profile" notification email.
-     *
-     * @param toEmail         Recipient's email address.
-     * @param likedUserName   Recipient's display name (used in greeting).
-     * @param likedByUserName Name of the person who liked the recipient.
-     */
     public void sendLikeNotificationEmail(String toEmail,
                                            String likedUserName,
                                            String likedByUserName) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            // true = multipart (needed for HTML body)
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(fromAddress);
             helper.setTo(toEmail);
             helper.setSubject("Someone liked your SkillSwipe profile \u2764\uFE0F");
-            helper.setText(buildEmailBody(likedUserName, likedByUserName), true); // true = HTML
+            helper.setText(buildEmailBody(likedUserName, likedByUserName), true);
 
             mailSender.send(message);
 
@@ -64,14 +41,10 @@ public class EmailNotificationService {
                     toEmail, likedByUserName);
 
         } catch (MessagingException e) {
-            // Log but don't rethrow — a failed email must not crash the consumer
-            // or cause Kafka to endlessly retry the same event.
             log.error("[Email Service] Failed to send notification email to '{}': {}",
                     toEmail, e.getMessage(), e);
         }
     }
-
-    // ─── Private helpers ─────────────────────────────────────────────────────
 
     private String buildEmailBody(String likedUserName, String likedByUserName) {
         return """

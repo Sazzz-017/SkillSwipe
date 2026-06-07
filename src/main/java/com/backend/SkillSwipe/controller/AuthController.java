@@ -30,7 +30,6 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // POST /api/auth/register
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Users user) {
         if (userRepo.findByUserEmail(user.getUserEmail()).isPresent()) {
@@ -39,11 +38,10 @@ public class AuthController {
         user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
         if (user.getUserRole() == null) user.setUserRole("USER");
         Users saved = userRepo.save(user);
-        saved.setUserPassword(null); // don't return password
+        saved.setUserPassword(null);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    // POST /api/auth/login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String email = credentials.get("email");

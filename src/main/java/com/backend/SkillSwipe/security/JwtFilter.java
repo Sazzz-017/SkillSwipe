@@ -44,7 +44,6 @@ public class JwtFilter extends OncePerRequestFilter {
                     }
                 }
             } catch (Exception ignored) {
-                // Invalid token — just continue without setting auth
             }
         }
 

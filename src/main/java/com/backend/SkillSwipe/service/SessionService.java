@@ -56,7 +56,6 @@ public class SessionService {
         Users proposedBy = getAuthenticatedUser();
         LocalDateTime proposedTime = LocalDateTime.parse(proposedTimeStr, FLEXIBLE_FORMATTER);
 
-        // Delete existing proposals for this session before creating new one
         sessionProposalRepo.deleteBySession(session);
 
         SessionProposal proposal = new SessionProposal();

@@ -18,7 +18,6 @@ public class ReviewService {
     @Autowired
     UserRepo userRepo;
 
-    // POST /api/reviews
     public Reviews createReview(Reviews review) {
         userRepo.findById(review.getReviewer().getUserId())
                 .orElseThrow(() -> new RuntimeException("Reviewer not found with id: " + review.getReviewer().getUserId()));
@@ -30,7 +29,6 @@ public class ReviewService {
         return reviewsRepo.save(review);
     }
 
-    // GET /api/reviews/user/{id}
     public List<Reviews> getReviewsForUser(int userId) {
         Users reviewedUser = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));

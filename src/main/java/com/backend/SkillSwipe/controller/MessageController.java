@@ -16,7 +16,6 @@ public class MessageController {
     @Autowired
     MessageService messageService;
 
-    // POST /api/messages
     @PostMapping
     public ResponseEntity<Message> sendMessage(@RequestBody Message message) {
         try {
@@ -26,7 +25,6 @@ public class MessageController {
         }
     }
 
-    // GET /api/messages/conversation?userId1=&userId2=
     @GetMapping("/conversation")
     public ResponseEntity<List<Message>> getConversation(@RequestParam int userId1, @RequestParam int userId2) {
         try {
@@ -36,7 +34,6 @@ public class MessageController {
         }
     }
 
-    // GET /api/messages/unread?userId=
     @GetMapping("/unread")
     public ResponseEntity<List<Message>> getUnreadMessages(@RequestParam int userId) {
         try {

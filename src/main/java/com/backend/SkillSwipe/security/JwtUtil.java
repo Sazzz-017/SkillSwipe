@@ -12,8 +12,8 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET = "SkillSwipeSecretKeyForJWTAuthenticationMustBe256Bits!!";
-    private static final long EXPIRATION_MS = 86400000; // 24 hours
+    private static final String SECRET = ; //Removed Intentionally for Submission
+    private static final long EXPIRATION_MS = 86400000;
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());

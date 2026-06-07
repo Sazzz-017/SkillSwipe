@@ -26,7 +26,6 @@ public class SpringAiConfig {
 
     @Bean
     public OpenAiApi openAiApi() {
-        // SimpleClientHttpRequestFactory uses HttpURLConnection which is HTTP/1.1 only
         RestClient.Builder restClientBuilder = RestClient.builder()
                 .requestFactory(new SimpleClientHttpRequestFactory());
 

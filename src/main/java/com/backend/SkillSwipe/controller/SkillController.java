@@ -11,17 +11,14 @@ import java.util.List;
 public class SkillController {
     @Autowired
     SkillService skillService;
-    // GET /api/skills
     @GetMapping("/api/skills")
     public ResponseEntity<List<Skills>> getAllSkills() {
         return ResponseEntity.ok(skillService.getAllSkills());
     }
-    // POST /api/skills
     @PostMapping("/api/skills")
     public ResponseEntity<Skills> createSkill(@RequestBody Skills skill) {
         return ResponseEntity.status(HttpStatus.CREATED).body(skillService.createSkill(skill));
     }
-    // POST /api/users/skills
     @PostMapping("/api/users/skills")
     public ResponseEntity<?> addSkillToUser(@RequestBody UsersSkills usersSkills) {
         try {
@@ -30,7 +27,6 @@ public class SkillController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-    // DELETE /api/users/skills/{id}
     @DeleteMapping("/api/users/skills/{id}")
     public ResponseEntity<Void> removeSkillFromUser(@PathVariable int id) {
         try {

@@ -18,7 +18,6 @@ public class MessageService {
     @Autowired
     UserRepo userRepo;
 
-    // Send a message
     public Message sendMessage(Message message) {
         userRepo.findById(message.getSender().getUserId())
                 .orElseThrow(() -> new RuntimeException("Sender not found with id: " + message.getSender().getUserId()));
@@ -27,7 +26,6 @@ public class MessageService {
         return messageRepo.save(message);
     }
 
-    // Get conversation between two users
     public List<Message> getConversation(int userId1, int userId2) {
         Users user1 = userRepo.findById(userId1)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId1));
@@ -36,7 +34,6 @@ public class MessageService {
         return messageRepo.findConversation(user1, user2);
     }
 
-    // Get unread messages for a user
     public List<Message> getUnreadMessages(int userId) {
         Users receiver = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));

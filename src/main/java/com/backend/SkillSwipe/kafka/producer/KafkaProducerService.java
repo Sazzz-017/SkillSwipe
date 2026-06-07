@@ -10,18 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * KafkaProducerService — the write side of the event-driven flow.
- *
- * Responsibility: publish a LikeNotificationEvent to the Kafka topic
- * whenever a user performs a LIKE swipe action.
- *
- * The call is fire-and-forget from the HTTP thread's perspective:
- *  - KafkaTemplate.send() is non-blocking.
- *  - We attach a callback purely for observability (logging success/failure).
- *  - The HTTP response is returned to the client immediately, without
- *    waiting for the email to be sent.
- */
 @Service
 public class KafkaProducerService {
 
@@ -36,11 +24,6 @@ public class KafkaProducerService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    /**
-     * Publishes a like-notification event to Kafka.
-     *
-     * @param event The event containing liked-user info and the liker's name.
-     */
     public void publishLikeNotification(LikeNotificationEvent event) {
         String messageKey = event.getLikedUserEmail();
 
@@ -61,9 +44,6 @@ public class KafkaProducerService {
                 }
             });
         } catch (Exception e) {
-            // Kafka is not running — log a warning and continue.
-            // The like action itself has already been saved successfully.
-            // Email notification will simply not be sent for this event.
             log.warn("[Kafka Producer] Kafka unavailable — like notification skipped for '{}'. Start Kafka to enable email notifications.",
                     event.getLikedUserEmail());
         }
